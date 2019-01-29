@@ -26,7 +26,7 @@ const getters = {
 const actions = {
   userSignUp ({commit, dispatch, rootGetters}, payload) {
     if (!rootGetters['users/isEmailUnique'](payload.email)) {
-      // commit('setError', 'Account with this email already exists')
+      commit('setError', 'Account with this email already exists')
       return
     }
     dispatch('users/addUser', payload, {root: true})
