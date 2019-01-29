@@ -49,8 +49,17 @@ const actions = {
     //   commit('setLoading', false)
     // })
   },
-  userSignIn ({commit}, payload) {
+  userSignIn ({commit, rootGetters}, payload) {
     // commit('setLoading', true)
+    const savedUser = rootGetters['users/getUserByEmail'](payload.email)
+    if (savedUser === undefined) {
+      commit('setError', 'Account with this email dosen\'t exist')
+      return
+    }
+    if (savedUser.password !== payload.password) {
+      commit('setError', 'Wrong password for this email')
+      return
+    }
     commit('setUser', { email: payload.email })
     router.push('/home')
     // firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)

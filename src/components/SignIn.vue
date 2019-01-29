@@ -32,10 +32,10 @@ export default {
   },
   computed: {
     error () {
-      return this.$store.state.error
+      return this.$store.state.auth.error
     },
     loading () {
-      return this.$store.state.loading
+      return this.$store.state.auth.loading
     }
   },
   watch: {
