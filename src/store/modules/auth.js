@@ -24,11 +24,18 @@ const getters = {
   }
 }
 const actions = {
-  userSignUp ({commit}, payload) {
-    // Add user to /users
+  userSignUp ({commit, dispatch, rootGetters}, payload) {
+    if (!rootGetters['users/isEmailUnique'](payload.email)) {
+      // commit('setError', 'Account with this email already exists')
+      return
+    }
+    dispatch('users/addUser', payload, {root: true})
     commit('setUser', { email: payload.email })
-    // rootState.// verify from /users/
     router.push('/home')
+    // commit('setUser', { email: payload.email })
+    // rootState.// verify from /users/
+    // router.push('/home')
+    //
     // commit('setLoading', true)
     // rootState.// verify from /users/
     // firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
