@@ -16,6 +16,7 @@
               v-text-field#confirmPassword(name='confirmPassword', v-model='passwordConfirm', label='Confirm Password', type='password', required='', :rules='[comparePasswords]')
             v-flex(mt-5='')
               v-checkbox(v-model='roles.isAdmin', label='Administrators')
+            v-flex(v-show='!roles.isAdmin')
               v-checkbox(v-model='roles.isEditor', label='Editors')
               v-checkbox(v-model='roles.isTranslator', label='Translators')
               v-checkbox(v-model='roles.isDesigner', label='Designer')
