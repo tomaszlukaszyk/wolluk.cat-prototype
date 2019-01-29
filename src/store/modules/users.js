@@ -7,11 +7,25 @@ const getters = {
   },
   isEmailUnique: (state, getters) => (email) => {
     return getters.getUserByEmail(email) === undefined
+  },
+  roles (state) {
+    return state.roles
   }
 }
 const actions = {
   addUser ({commit}, payload) {
-    commit('addUser', payload)
+    const user = {
+      id: '_' + Math.random().toString(36).substr(2, 10),
+      displayName: payload.displayName,
+      email: payload.email,
+      password: payload.password,
+      roles: payload.roles.isAdmin ? {isAdmin: true} : {
+        isEditor: payload.roles.isEditor,
+        isTranslator: payload.roles.isTranslator,
+        isDesigner: payload.roles.isDesigner
+      }
+    }
+    commit('addUser', user)
   }
 }
 const mutations = {

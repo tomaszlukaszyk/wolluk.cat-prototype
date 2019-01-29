@@ -7,11 +7,18 @@
         form(@submit.prevent="userSignUp")
           v-layout(column='')
             v-flex
+              v-text-field#displayName(name='displayName', v-model='displayName', label='Display Name', type='text', required='')
+            v-flex
               v-text-field#email(name='email', v-model='email', label='Email', type='email', required='')
             v-flex
               v-text-field#password(name='password', v-model='password', label='Password', type='password', required='')
             v-flex
               v-text-field#confirmPassword(name='confirmPassword', v-model='passwordConfirm', label='Confirm Password', type='password', required='', :rules='[comparePasswords]')
+            v-flex(mt-5='')
+              v-checkbox(v-model='roles.isAdmin', label='Administrators')
+              v-checkbox(v-model='roles.isEditor', label='Editors')
+              v-checkbox(v-model='roles.isTranslator', label='Translators')
+              v-checkbox(v-model='roles.isDesigner', label='Designer')
             v-flex.text-xs-center(mt-5='')
               v-btn(color='primary', type='submit', :disabled="loading") Sign Up
             v-flex
@@ -23,9 +30,16 @@
 export default {
   data () {
     return {
+      displayName: '',
       email: '',
       password: '',
       passwordConfirm: '',
+      roles: {
+        isAdmin: false,
+        isEditor: false,
+        isTranslator: false,
+        isDesigner: false
+      },
       alert: false
     }
   },
@@ -45,7 +59,12 @@ export default {
       if (this.comparePasswords !== true) {
         return
       }
-      this.$store.dispatch('auth/userSignUp', { email: this.email, password: this.password })
+      this.$store.dispatch('auth/userSignUp', {
+        displayName: this.displayName,
+        email: this.email,
+        password: this.password,
+        roles: this.roles
+      })
     }
   },
   watch: {
