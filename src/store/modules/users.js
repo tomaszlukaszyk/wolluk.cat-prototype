@@ -7,9 +7,6 @@ const getters = {
   },
   isEmailUnique: (state, getters) => (email) => {
     return getters.getUserByEmail(email) === undefined
-  },
-  roles (state) {
-    return state.roles
   }
 }
 const actions = {
@@ -26,11 +23,23 @@ const actions = {
       }
     }
     commit('addUser', user)
+  },
+  updateUser ({commit}, payload) {
+    payload.roles = payload.roles.isAdmin ? {isAdmin: true} : {
+      isEditor: payload.roles.isEditor,
+      isTranslator: payload.roles.isTranslator,
+      isDesigner: payload.roles.isDesigner
+    }
+    commit('deleteUser', payload)
+    commit('addUser', JSON.parse(JSON.stringify(payload)))
   }
 }
 const mutations = {
   addUser (state, payload) {
     state.items.push(payload)
+  },
+  deleteUser (state, payload) {
+    state.items = state.items.filter(user => user.id !== payload.id)
   }
 }
 export default {

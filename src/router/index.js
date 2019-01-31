@@ -22,6 +22,12 @@ const routerOptions = [
       { default: 'ObjectEdit' },
     meta: { requiresAuth: true }
   },
+  {
+    path: '/account',
+    name: 'editUserAccount',
+    component: 'UserAccount',
+    meta: { requiresAuth: true }
+  },
   { path: '*', component: 'NotFound' }
 ]
 

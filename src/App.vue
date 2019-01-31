@@ -16,7 +16,7 @@
           v-btn(flat slot='activator')
             v-icon settings
           v-list(light)
-            v-list-tile(@click='userSignOut') 
+            v-list-tile(router to='/account') 
               v-list-tile-action
                 v-icon(left) account_circle
               v-list-tile-title My account
