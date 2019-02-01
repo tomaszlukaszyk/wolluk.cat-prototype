@@ -27,6 +27,7 @@
 export default {
   data () {
     return {
+      id: '',
       displayName: '',
       email: '',
       roles: {
@@ -42,6 +43,7 @@ export default {
     updateUser () {
       this.$store.commit('auth/setUser', { email: this.email })
       this.$store.dispatch('users/updateUser', {
+        id: this.id,
         displayName: this.displayName,
         email: this.email,
         roles: this.roles
@@ -50,6 +52,7 @@ export default {
     setUserFromState () {
       const email = this.$store.state.auth.user.email
       const user = this.$store.getters['users/getUserByEmail'](email)
+      this.id = user.id
       this.displayName = user.displayName
       this.email = user.email
       this.roles.isAdmin = user.roles.isAdmin

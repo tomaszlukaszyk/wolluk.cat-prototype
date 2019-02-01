@@ -35,7 +35,7 @@ const actions = {
       commit('setError', 'Old password is incorrect')
       return
     }
-    payload['id'] = user.id
+    payload.id = user.id
     commit('updatePassword', payload)
   }
 }
