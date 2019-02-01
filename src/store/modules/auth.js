@@ -21,6 +21,13 @@ const mutations = {
 const getters = {
   isAuthenticated (state) {
     return state.user !== null && state.user !== undefined
+  },
+  isAdmin (state, getters, rootState, rootGetters) {
+    if (state.user == null) {
+      return false
+    }
+    const user = rootGetters['users/getUserByEmail'](state.user.email)
+    return user.roles.isAdmin === true
   }
 }
 const actions = {

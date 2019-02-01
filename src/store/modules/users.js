@@ -2,14 +2,32 @@ import md5 from 'crypto-js/md5'
 
 const state = {
   items: [],
-  error: null
+  error: null,
+  structure: {
+    roles: {
+      type: 'checkbox',
+      label: 'User roles',
+      options: {
+        admin: 'Administrators',
+        editor: 'Editors',
+        translator: 'Translators',
+        Designer: 'Designers'
+      }
+    }
+  }
 }
 const getters = {
+  getAllUsers (state) {
+    return state.items
+  },
   getUserByEmail: (state) => (email) => {
     return state.items.filter(item => item.email === email)[0]
   },
   isEmailUnique: (state, getters) => (email) => {
     return getters.getUserByEmail(email) === undefined
+  },
+  structure (state) {
+    return state.structure
   }
 }
 const actions = {

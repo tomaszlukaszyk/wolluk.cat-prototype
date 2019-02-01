@@ -27,6 +27,7 @@ import {
   VAlert,
   VMenu,
   VDivider,
+  VCard,
   transitions
 } from 'vuetify'
 
@@ -51,6 +52,7 @@ Vue.use(Vuetify, {
     VAlert,
     VMenu,
     VDivider,
+    VCard,
     transitions
   },
   theme: {

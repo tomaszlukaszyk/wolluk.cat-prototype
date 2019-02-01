@@ -24,6 +24,10 @@
               v-list-tile-action
                 v-icon(left) vpn_key
               v-list-tile-title Reset password
+            v-list-tile(v-if='isAdmin', router to='/users') 
+              v-list-tile-action
+                v-icon(left) people
+              v-list-tile-title System users
             v-divider
             v-list-tile(@click='userSignOut') 
               v-list-tile-action
@@ -47,6 +51,9 @@
       // },
       isAuthenticated () {
         return this.$store.getters['auth/isAuthenticated']
+      },
+      isAdmin () {
+        return this.$store.getters['auth/isAdmin']
       },
       menuItems () {
         if (this.isAuthenticated) {

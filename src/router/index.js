@@ -34,6 +34,13 @@ const routerOptions = [
     component: 'PasswordReset',
     meta: { requiresAuth: true }
   },
+  {
+    path: '/users',
+    name: 'listUsers',
+    components:
+      { default: 'Users', sidebar: 'UsersSidebar' },
+    meta: { requiresAuth: true }
+  },
   { path: '*', component: 'NotFound' }
 ]
 
