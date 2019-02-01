@@ -28,6 +28,12 @@ const routerOptions = [
     component: 'UserAccount',
     meta: { requiresAuth: true }
   },
+  {
+    path: '/password',
+    name: 'resetPassword',
+    component: 'PasswordReset',
+    meta: { requiresAuth: true }
+  },
   { path: '*', component: 'NotFound' }
 ]
 

@@ -27,6 +27,16 @@ const actions = {
   },
   updateUser ({commit}, payload) {
     commit('updateUser', payload)
+  },
+  updatePassword ({commit, getters, rootState}, payload) {
+    const email = rootState.auth.user.email
+    const user = getters.getUserByEmail(email)
+    if (user.password !== payload.oldPassword) {
+      commit('setError', 'Old password is incorrect')
+      return
+    }
+    payload['id'] = user.id
+    commit('updatePassword', payload)
   }
 }
 const mutations = {
@@ -45,6 +55,10 @@ const mutations = {
       isTranslator: payload.roles.isTranslator,
       isDesigner: payload.roles.isDesigner
     }
+  },
+  updatePassword (state, payload) {
+    const user = state.items.find(user => user.id === payload.id)
+    user.password = payload.newPassword
   },
   setError (state, payload) {
     state.error = payload

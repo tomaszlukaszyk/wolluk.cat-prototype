@@ -20,6 +20,10 @@
               v-list-tile-action
                 v-icon(left) account_circle
               v-list-tile-title My account
+            v-list-tile(router to='/password') 
+              v-list-tile-action
+                v-icon(left) vpn_key
+              v-list-tile-title Reset password
             v-divider
             v-list-tile(@click='userSignOut') 
               v-list-tile-action
