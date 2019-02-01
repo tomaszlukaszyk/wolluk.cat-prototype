@@ -1,3 +1,5 @@
+import md5 from 'crypto-js/md5'
+
 const state = {
   items: [],
   error: null
@@ -44,7 +46,11 @@ const mutations = {
     const user = state.items.find(user => user.id === payload.id)
     if (payload.displayName) { user.displayName = payload.displayName }
     if (payload.password) { user.password = payload.password }
-    if (payload.email) { user.email = payload.email }
+    if (payload.email) {
+      user.email = payload.email
+      const hash = md5(payload.email.trim().toLowerCase())
+      user.gravatar = `https://www.gravatar.com/avatar/${hash}?s=200&d=identicon`
+    }
     if (payload.roles) {
       user.roles = payload.roles.isAdmin ? {isAdmin: true} : {
         isEditor: payload.roles.isEditor,

@@ -3,7 +3,9 @@
     v-layout(row='', wrap='')
       v-flex.text-xs-center(xs12='', mt-5='')
         h1 Edit account details
-      v-flex(xs12='', sm6='', offset-sm3='', mt-3='')
+      v-flex.text-xs-center(xs12, sm5, mt-3, pr-5)
+        img(:src='gravatar', style='border-radius: 50%; width:200px')
+      v-flex(xs12, sm5, mt-3)
         form(@submit.prevent="updateUser")
           v-layout(column='')
             v-flex
@@ -30,6 +32,7 @@ export default {
       id: '',
       displayName: '',
       email: '',
+      gravatar: '',
       roles: {
         isAdmin: false,
         isEditor: false,
@@ -55,6 +58,7 @@ export default {
       this.id = user.id
       this.displayName = user.displayName
       this.email = user.email
+      this.gravatar = user.gravatar
       this.roles.isAdmin = user.roles.isAdmin
       this.roles.isEditor = user.roles.isEditor
       this.roles.isTranslator = user.roles.isTranslator
