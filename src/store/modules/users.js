@@ -12,18 +12,10 @@ const getters = {
 }
 const actions = {
   addUser ({commit}, payload) {
-    const user = {
-      id: '_' + Math.random().toString(36).substr(2, 10),
-      displayName: payload.displayName,
-      email: payload.email,
-      password: payload.password,
-      roles: payload.roles.isAdmin ? {isAdmin: true} : {
-        isEditor: payload.roles.isEditor,
-        isTranslator: payload.roles.isTranslator,
-        isDesigner: payload.roles.isDesigner
-      }
-    }
+    const user = { id: '_' + Math.random().toString(36).substr(2, 10) }
     commit('addUser', user)
+    payload.id = user.id
+    commit('updateUser', payload)
   },
   updateUser ({commit}, payload) {
     commit('updateUser', payload)
@@ -35,8 +27,10 @@ const actions = {
       commit('setError', 'Old password is incorrect')
       return
     }
-    payload.id = user.id
-    commit('updatePassword', payload)
+    commit('updateUser', {
+      id: user.id,
+      password: payload.newPassword
+    })
   }
 }
 const mutations = {
@@ -48,17 +42,16 @@ const mutations = {
   },
   updateUser (state, payload) {
     const user = state.items.find(user => user.id === payload.id)
-    user.displayName = payload.displayName
-    user.email = payload.email
-    user.roles = payload.roles.isAdmin ? {isAdmin: true} : {
-      isEditor: payload.roles.isEditor,
-      isTranslator: payload.roles.isTranslator,
-      isDesigner: payload.roles.isDesigner
+    if (payload.displayName) { user.displayName = payload.displayName }
+    if (payload.password) { user.password = payload.password }
+    if (payload.email) { user.email = payload.email }
+    if (payload.roles) {
+      user.roles = payload.roles.isAdmin ? {isAdmin: true} : {
+        isEditor: payload.roles.isEditor,
+        isTranslator: payload.roles.isTranslator,
+        isDesigner: payload.roles.isDesigner
+      }
     }
-  },
-  updatePassword (state, payload) {
-    const user = state.items.find(user => user.id === payload.id)
-    user.password = payload.newPassword
   },
   setError (state, payload) {
     state.error = payload
