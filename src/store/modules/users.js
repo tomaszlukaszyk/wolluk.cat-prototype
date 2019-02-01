@@ -1,5 +1,6 @@
 const state = {
-  items: []
+  items: [],
+  error: null
 }
 const getters = {
   getUserByEmail: (state) => (email) => {
@@ -25,13 +26,7 @@ const actions = {
     commit('addUser', user)
   },
   updateUser ({commit}, payload) {
-    payload.roles = payload.roles.isAdmin ? {isAdmin: true} : {
-      isEditor: payload.roles.isEditor,
-      isTranslator: payload.roles.isTranslator,
-      isDesigner: payload.roles.isDesigner
-    }
-    commit('deleteUser', payload)
-    commit('addUser', JSON.parse(JSON.stringify(payload)))
+    commit('updateUser', payload)
   }
 }
 const mutations = {
@@ -40,6 +35,19 @@ const mutations = {
   },
   deleteUser (state, payload) {
     state.items = state.items.filter(user => user.id !== payload.id)
+  },
+  updateUser (state, payload) {
+    const user = state.items.find(user => user.id === payload.id)
+    user.displayName = payload.displayName
+    user.email = payload.email
+    user.roles = payload.roles.isAdmin ? {isAdmin: true} : {
+      isEditor: payload.roles.isEditor,
+      isTranslator: payload.roles.isTranslator,
+      isDesigner: payload.roles.isDesigner
+    }
+  },
+  setError (state, payload) {
+    state.error = payload
   }
 }
 export default {
