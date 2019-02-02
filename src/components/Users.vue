@@ -16,15 +16,30 @@
                   v-flex(xs4, ma-1)
                     img(:src='item.gravatar', height='80px')
               v-card-actions
-                v-btn(flat, color='primary', small) Delete
+                v-btn(flat, color='primary', small, @click='openDeleteDialog(item.id)') Delete
                 v-btn(flat, color='primary', small, @click='editUser(item.id)', :to="{name:'editUser'}") Edit
     v-btn(fab bottom right color="pink" dark fixed :to="{name:'editUser'}")
       v-icon add
+    v-layout(row, justify-center)
+    v-dialog(v-model='dialog', persistent, max-width='300')
+      v-card
+        v-card-title.headline
+          | Are you sure you want to delete this user?
+        v-card-actions
+          v-spacer
+          v-btn(flat, small, color='primary', @click='deleteUser') Delete
+          v-btn(flat, small, color='primary', @click='closeDeleteDialog') Cancel
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 export default {
+  data () {
+    return {
+      dialog: false,
+      userToDeleteId: ''
+    }
+  },
   computed: {
     ...mapGetters({
       filter: 'users/structure',
@@ -50,6 +65,18 @@ export default {
     },
     editUser (id) {
       this.$store.commit('users/setUserToEdit', id)
+    },
+    openDeleteDialog (id) {
+      this.dialog = true
+      this.userToDeleteId = id
+    },
+    closeDeleteDialog () {
+      this.dialog = false
+      this.userToDeleteId = ''
+    },
+    deleteUser () {
+      this.$store.commit('users/deleteUser', this.userToDeleteId)
+      this.closeDeleteDialog()
     }
   }
 }

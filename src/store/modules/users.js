@@ -73,8 +73,8 @@ const mutations = {
   addUser (state, payload) {
     state.items.push(payload)
   },
-  deleteUser (state, payload) {
-    state.items = state.items.filter(user => user.id !== payload.id)
+  deleteUser (state, id) {
+    state.items = state.items.filter(user => user.id !== id)
   },
   updateUser (state, payload) {
     const user = state.items.find(user => user.id === payload.id)
