@@ -10,7 +10,9 @@
                 v-layout(row)
                   v-flex.text-xs-left(xs8)
                     div.headline {{ item.displayName }}
-                    div {{ item.email }}
+                    v-flex(mt-1)
+                    div.grey--text {{ item.email }}
+                    div.grey--text {{ getStringForRoles(item.roles) }}
                   v-flex(xs4, ma-1)
                     img(:src='item.gravatar', height='80px')
               v-card-actions
@@ -28,6 +30,24 @@ export default {
       filter: 'users/structure',
       items: 'users/getAllUsers'
     })
+  },
+  methods: {
+    getStringForRoles (roles) {
+      let string = ''
+      if (roles.isAdmin) {
+        string += 'ADMIN, '
+      }
+      if (roles.isEditor) {
+        string += 'EDITOR, '
+      }
+      if (roles.isTranslator) {
+        string += 'TRANSALATOR, '
+      }
+      if (roles.isDesigner) {
+        string += 'DESIGNER, '
+      }
+      return string.substr(0, string.length-2)
+    }
   }
 }
 </script>
