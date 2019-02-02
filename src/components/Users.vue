@@ -17,8 +17,8 @@
                     img(:src='item.gravatar', height='80px')
               v-card-actions
                 v-btn(flat, color='primary', small) Delete
-                v-btn(flat, color='primary', small) Edit
-    v-btn(fab bottom right color="pink" dark fixed :to="{name:'createObject'}")
+                v-btn(flat, color='primary', small, @click='editUser(item.id)', :to="{name:'editUser'}") Edit
+    v-btn(fab bottom right color="pink" dark fixed :to="{name:'editUser'}")
       v-icon add
 </template>
 
@@ -46,7 +46,10 @@ export default {
       if (roles.isDesigner) {
         string += 'DESIGNER, '
       }
-      return string.substr(0, string.length-2)
+      return string.substr(0, string.length - 2)
+    },
+    editUser (id) {
+      this.$store.commit('users/setUserToEdit', id)
     }
   }
 }

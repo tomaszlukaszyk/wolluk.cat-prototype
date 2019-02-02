@@ -41,6 +41,12 @@ const routerOptions = [
       { default: 'Users', sidebar: 'UsersSidebar' },
     meta: { requiresAuth: true }
   },
+  {
+    path: '/users/edit',
+    name: 'editUser',
+    component: 'UserEdit',
+    meta: { requiresAuth: true }
+  },
   { path: '*', component: 'NotFound' }
 ]
 

@@ -1,7 +1,9 @@
 import md5 from 'crypto-js/md5'
+import router from '@/router'
 
 const state = {
   items: [],
+  userToEdit: null,
   error: null,
   structure: {
     roles: {
@@ -31,14 +33,28 @@ const getters = {
   }
 }
 const actions = {
-  addUser ({commit}, payload) {
+  addUser ({commit, getters}, payload) {
+    if (!getters.isEmailUnique(payload.email)) {
+      commit('setError', 'Account with this email already exists')
+      return
+    }
     const user = { id: '_' + Math.random().toString(36).substr(2, 10) }
     commit('addUser', user)
     payload.id = user.id
     commit('updateUser', payload)
+    if (payload.path) {
+      router.push(payload.path)
+    }
   },
-  updateUser ({commit}, payload) {
+  updateUser ({commit, state}, payload) {
+    if (state.items.find(user => user.email === payload.email && user.id !== payload.id)) {
+      commit('setError', 'That email is already taken')
+      return
+    }
     commit('updateUser', payload)
+    if (payload.path) {
+      router.push(payload.path)
+    }
   },
   updatePassword ({commit, getters, rootState}, payload) {
     const email = rootState.auth.user.email
@@ -79,6 +95,13 @@ const mutations = {
   },
   setError (state, payload) {
     state.error = payload
+  },
+  setUserToEdit (state, id) {
+    if (id !== null && id !== undefined) {
+      state.userToEdit = state.items.find(user => user.id === id)
+    } else {
+      state.userToEdit = null
+    }
   }
 }
 export default {
