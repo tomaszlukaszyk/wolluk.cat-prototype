@@ -9,6 +9,7 @@ const state = {
     roles: {}
   },
   error: null,
+  success: null,
   structure: {
     roles: {
       type: 'checkbox',
@@ -94,6 +95,7 @@ const actions = {
       id: user.id,
       password: payload.newPassword
     })
+    router.push('/account')
   }
 }
 const mutations = {
@@ -122,6 +124,9 @@ const mutations = {
   },
   setError (state, payload) {
     state.error = payload
+  },
+  setSuccess (state, payload) {
+    state.success = payload
   },
   setUserToEdit (state, id) {
     if (id !== null && id !== undefined) {

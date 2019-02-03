@@ -25,6 +25,8 @@
               v-btn(color='primary', type='submit') Save
             v-flex
               v-alert(type='error', dismissible='', v-model='alert') {{ error }}
+            v-flex
+              v-alert(type='success', dismissible, v-model='successAlert') {{ success }}
 </template>
 
 <script>
@@ -41,12 +43,16 @@ export default {
         isTranslator: false,
         isDesigner: false
       },
-      alert: false
+      alert: false,
+      successAlert: false
     }
   },
   computed: {
     error () {
       return this.$store.state.users.error
+    },
+    success () {
+      return this.$store.state.users.success
     }
   },
   methods: {
@@ -56,7 +62,10 @@ export default {
         displayName: this.displayName,
         email: this.email,
         roles: this.roles
-      }).then(() => this.$store.commit('auth/setUser', { email: this.email }))
+      }).then(() => {
+        this.$store.commit('auth/setUser', { email: this.email })
+        this.$store.commit('users/setSuccess', 'Account information updated successfully')
+        })
     },
     setUserFromState () {
       const email = this.$store.state.auth.user.email
@@ -83,6 +92,16 @@ export default {
     alert (value) {
       if (!value) {
         this.$store.commit('users/setError', null)
+      }
+    },
+    success (value) {
+      if (value) {
+        this.successAlert = true
+      }
+    },
+    successAlert (value) {
+      if (!value) {
+        this.$store.commit('users/setSuccess', null)
       }
     }
   }
