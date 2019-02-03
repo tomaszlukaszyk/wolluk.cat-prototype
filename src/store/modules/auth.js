@@ -27,6 +27,9 @@ const getters = {
       return false
     }
     const user = rootGetters['users/getUserByEmail'](state.user.email)
+    if (!user) {
+      return false
+    }
     return user.roles.isAdmin === true
   }
 }

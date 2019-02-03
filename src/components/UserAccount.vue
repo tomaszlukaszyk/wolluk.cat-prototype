@@ -23,6 +23,8 @@
             v-flex(mt-5='')
               v-btn(@click='setUserFromState', right) Cancel
               v-btn(color='primary', type='submit') Save
+            v-flex
+              v-alert(type='error', dismissible='', v-model='alert') {{ error }}
 </template>
 
 <script>
@@ -42,15 +44,19 @@ export default {
       alert: false
     }
   },
+  computed: {
+    error () {
+      return this.$store.state.users.error
+    }
+  },
   methods: {
     updateUser () {
-      this.$store.commit('auth/setUser', { email: this.email })
       this.$store.dispatch('users/updateUser', {
         id: this.id,
         displayName: this.displayName,
         email: this.email,
         roles: this.roles
-      })
+      }).then(() => this.$store.commit('auth/setUser', { email: this.email }))
     },
     setUserFromState () {
       const email = this.$store.state.auth.user.email
@@ -67,6 +73,18 @@ export default {
   },
   created () {
     this.setUserFromState()
+  },
+  watch: {
+    error (value) {
+      if (value) {
+        this.alert = true
+      }
+    },
+    alert (value) {
+      if (!value) {
+        this.$store.commit('users/setError', null)
+      }
+    }
   }
 }
 </script>

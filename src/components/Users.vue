@@ -17,7 +17,7 @@
                     img(:src='item.gravatar', height='80px')
               v-card-actions
                 v-btn(:disabled='item.email === currentUser.email', flat, color='primary', small, @click='openDeleteDialog(item.id)') Delete
-                v-btn(flat, color='primary', small, @click='editUser(item.id)', :to="{name:'editUser'}") Edit
+                v-btn(:disabled='item.email === currentUser.email', flat, color='primary', small, @click='editUser(item.id)', :to="{name:'editUser'}") Edit
     v-btn(fab bottom right color="pink" dark fixed :to="{name:'editUser'}")
       v-icon add
     v-layout(row, justify-center)

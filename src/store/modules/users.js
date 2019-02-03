@@ -76,14 +76,17 @@ const actions = {
     }
   },
   updateUser ({commit, state}, payload) {
-    if (state.items.find(user => user.email === payload.email && user.id !== payload.id)) {
-      commit('setError', 'That email is already taken')
-      return
-    }
-    commit('updateUser', payload)
-    if (payload.path) {
-      router.push(payload.path)
-    }
+    return new Promise(resolve => {
+      if (state.items.find(user => user.email === payload.email && user.id !== payload.id)) {
+        commit('setError', 'That email is already taken')
+        return
+      }
+      commit('updateUser', payload)
+      if (payload.path) {
+        router.push(payload.path)
+      }
+      resolve()
+    })
   },
   updatePassword ({commit, getters, rootState}, payload) {
     const email = rootState.auth.user.email
