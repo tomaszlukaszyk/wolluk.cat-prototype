@@ -13,11 +13,11 @@
             v-flex
               v-text-field#displayName(name='displayName', v-model='displayName', label='Display Name', type='text', required='')
             v-flex(mt-5='')
-              v-checkbox(v-model='roles.isAdmin', label='Administrators', height='10')
+              v-checkbox(v-model='roles.isAdmin', label='Administrators', height='10', :rules='[roleChosen]')
             v-flex(v-show='!roles.isAdmin')
-              v-checkbox(v-model='roles.isEditor', label='Editors', height='10')
-              v-checkbox(v-model='roles.isTranslator', label='Translators', height='10')
-              v-checkbox(v-model='roles.isDesigner', label='Designer', height='10')
+              v-checkbox(v-model='roles.isEditor', label='Editors', height='10', :rules='[roleChosen]')
+              v-checkbox(v-model='roles.isTranslator', label='Translators', height='10', :rules='[roleChosen]')
+              v-checkbox(v-model='roles.isDesigner', label='Designer', height='10', :rules='[roleChosen]')
             v-flex(mt-5='')
               v-btn(flat, to='/password', color='red', small, right) Reset password
             v-flex(mt-5='')
@@ -53,10 +53,21 @@ export default {
     },
     success () {
       return this.$store.state.users.success
+    },
+    roleChosen () {
+      for (let key of Object.keys(this.roles)) {
+        if (this.roles[key]) {
+          return true
+        }
+      }
+      return 'You must choose at least one role'
     }
   },
   methods: {
     updateUser () {
+      if (this.roleChosen !== true) {
+        return
+      }
       this.$store.dispatch('users/updateUser', {
         id: this.id,
         displayName: this.displayName,
@@ -65,7 +76,7 @@ export default {
       }).then(() => {
         this.$store.commit('auth/setUser', { email: this.email })
         this.$store.commit('users/setSuccess', 'Account information updated successfully')
-        })
+      })
     },
     setUserFromState () {
       const email = this.$store.state.auth.user.email
