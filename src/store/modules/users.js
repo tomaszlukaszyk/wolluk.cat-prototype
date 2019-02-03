@@ -42,11 +42,6 @@ const getters = {
       item.email.toLowerCase().indexOf(state.filter.searchTerm) > -1)
     }
     return filteredUsers
-    // if (!state.filter.searchTerm) {
-    //   return state.items
-    // }
-    // return state.items.filter(item => item.displayName.toLowerCase().indexOf(state.filter.searchTerm) > -1 ||
-    // item.email.toLowerCase().indexOf(state.filter.searchTerm) > -1)
   },
   getUserByEmail: (state) => (email) => {
     return state.items.filter(item => item.email === email)[0]
