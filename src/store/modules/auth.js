@@ -31,6 +31,16 @@ const getters = {
       return false
     }
     return user.roles.isAdmin === true
+  },
+  getGravatar (state, getters, rootState, rootGetters) {
+    if (state.user == null) {
+      return false
+    }
+    const user = rootGetters['users/getUserByEmail'](state.user.email)
+    if (!user) {
+      return false
+    }
+    return user.gravatar
   }
 }
 const actions = {

@@ -18,7 +18,8 @@
           v-list(light)
             v-list-tile(router to='/account') 
               v-list-tile-action
-                v-icon(left) account_circle
+                v-icon(left, v-if='gravatar === false') account_circle
+                img(v-else, :src='gravatar', style='border-radius: 50%; width:30px')
               v-list-tile-title My account
             v-list-tile(router to='/password') 
               v-list-tile-action
@@ -54,6 +55,9 @@
       },
       isAdmin () {
         return this.$store.getters['auth/isAdmin']
+      },
+      gravatar () {
+        return this.$store.getters['auth/getGravatar']
       },
       menuItems () {
         if (this.isAuthenticated) {
