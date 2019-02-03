@@ -4,6 +4,10 @@ import router from '@/router'
 const state = {
   items: [],
   userToEdit: null,
+  filter: {
+    searchTerm: '',
+    roles: {}
+  },
   error: null,
   structure: {
     roles: {
@@ -13,14 +17,36 @@ const state = {
         admin: 'Administrators',
         editor: 'Editors',
         translator: 'Translators',
-        Designer: 'Designers'
+        designer: 'Designers'
       }
     }
   }
 }
 const getters = {
   getAllUsers (state) {
-    return state.items
+    let filteredUsers = state.items
+    if (state.filter.roles.admin) {
+      filteredUsers = filteredUsers.filter(user => user.roles.isAdmin)
+    }
+    if (state.filter.roles.editor) {
+      filteredUsers = filteredUsers.filter(user => user.roles.isEditor)
+    }
+    if (state.filter.roles.translator) {
+      filteredUsers = filteredUsers.filter(user => user.roles.isTranslator)
+    }
+    if (state.filter.roles.designer) {
+      filteredUsers = filteredUsers.filter(user => user.roles.isDesigner)
+    }
+    if (state.filter.searchTerm) {
+      filteredUsers = filteredUsers.filter(item => item.displayName.toLowerCase().indexOf(state.filter.searchTerm) > -1 ||
+      item.email.toLowerCase().indexOf(state.filter.searchTerm) > -1)
+    }
+    return filteredUsers
+    // if (!state.filter.searchTerm) {
+    //   return state.items
+    // }
+    // return state.items.filter(item => item.displayName.toLowerCase().indexOf(state.filter.searchTerm) > -1 ||
+    // item.email.toLowerCase().indexOf(state.filter.searchTerm) > -1)
   },
   getUserByEmail: (state) => (email) => {
     return state.items.filter(item => item.email === email)[0]
@@ -30,6 +56,9 @@ const getters = {
   },
   structure (state) {
     return state.structure
+  },
+  filter (state) {
+    return state.filter
   }
 }
 const actions = {
@@ -101,6 +130,14 @@ const mutations = {
       state.userToEdit = state.items.find(user => user.id === id)
     } else {
       state.userToEdit = null
+    }
+  },
+  setSearchTerm (state, payload) {
+    state.filter.searchTerm = payload
+  },
+  setSearchRoles (state, payload) {
+    for (const [key, value] of Object.entries(payload)) {
+      state.filter.roles[key] = value
     }
   }
 }
