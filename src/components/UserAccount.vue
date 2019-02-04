@@ -93,6 +93,8 @@ export default {
   },
   created () {
     this.setUserFromState()
+    this.$store.commit('users/setError', null)
+    this.$store.commit('users/setSuccess', null)
   },
   watch: {
     error (value) {

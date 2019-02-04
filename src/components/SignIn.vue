@@ -49,6 +49,9 @@ export default {
         this.$store.commit('auth/setError', null)
       }
     }
+  },
+  created () {
+    this.$store.commit('auth/setError', null)
   }
 }
 </script>
