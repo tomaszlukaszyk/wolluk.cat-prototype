@@ -96,6 +96,6 @@ export default {
   },
   created () {
       this.$store.commit('users/setError', null)
-    }
+  }
 }
 </script>

@@ -1,4 +1,5 @@
 import router from '@/router'
+import firebase from 'firebase'
 
 const state = {
   user: null,
@@ -45,60 +46,60 @@ const getters = {
 }
 const actions = {
   userSignUp ({commit, dispatch, rootGetters}, payload) {
-    if (!rootGetters['users/isEmailUnique'](payload.email)) {
-      commit('setError', 'Account with this email already exists')
-      return
-    }
-    dispatch('users/addUser', payload, {root: true})
-    commit('setUser', { email: payload.email })
-    router.push('/home')
+    // if (!rootGetters['users/isEmailUnique'](payload.email)) {
+    //   commit('setError', 'Account with this email already exists')
+    //   return
+    // }
+    // dispatch('users/addUser', payload, {root: true})
+    // commit('setUser', { email: payload.email })
+    // router.push('/home')
     // commit('setUser', { email: payload.email })
     // rootState.// verify from /users/
     // router.push('/home')
     //
-    // commit('setLoading', true)
+    commit('setLoading', true)
     // rootState.// verify from /users/
-    // firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-    // .then(firebaseUser => {
-    //   commit('setUser', {email: firebaseUser.user.email})
-    //   commit('setLoading', false)
-    //   router.push('/home')
-    // })
-    // .catch(error => {
-    //   commit('setError', error.message)
-    //   commit('setLoading', false)
-    // })
+    firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+    .then(firebaseUser => {
+      commit('setUser', {email: firebaseUser.user.email})
+      commit('setLoading', false)
+      router.push('/home')
+    })
+    .catch(error => {
+      commit('setError', error.message)
+      commit('setLoading', false)
+    })
   },
   userSignIn ({commit, rootGetters}, payload) {
-    // commit('setLoading', true)
-    const savedUser = rootGetters['users/getUserByEmail'](payload.email)
-    if (savedUser === undefined) {
-      commit('setError', 'Account with this email dosen\'t exist')
-      return
-    }
-    if (savedUser.password !== payload.password) {
-      commit('setError', 'Wrong password for this email')
-      return
-    }
-    commit('setUser', { email: payload.email })
-    router.push('/home')
-    // firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-    // .then(firebaseUser => {
-    //   commit('setUser', {email: firebaseUser.user.email})
-    //   commit('setLoading', false)
-    //   commit('setError', null)
-    //   router.push('/home')
-    // })
-    // .catch(error => {
-    //   commit('setError', error.message)
-    //   commit('setLoading', false)
-    // })
+    commit('setLoading', true)
+    // const savedUser = rootGetters['users/getUserByEmail'](payload.email)
+    // if (savedUser === undefined) {
+    //   commit('setError', 'Account with this email dosen\'t exist')
+    //   return
+    // }
+    // if (savedUser.password !== payload.password) {
+    //   commit('setError', 'Wrong password for this email')
+    //   return
+    // }
+    // commit('setUser', { email: payload.email })
+    // router.push('/home')
+    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+    .then(firebaseUser => {
+      commit('setUser', {email: firebaseUser.user.email})
+      commit('setLoading', false)
+      commit('setError', null)
+      router.push('/home')
+    })
+    .catch(error => {
+      commit('setError', error.message)
+      commit('setLoading', false)
+    })
   },
   autoSignIn ({commit}, payload) {
     commit('setUser', { email: payload.email })
   },
   userSignOut ({commit}) {
-    // firebase.auth().signOut()
+    firebase.auth().signOut()
     commit('setUser', null)
     router.push('/')
   }

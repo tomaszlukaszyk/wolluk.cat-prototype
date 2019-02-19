@@ -6,20 +6,20 @@
       v-flex(xs12='', sm6='', offset-sm3='', mt-3='')
         form(@submit.prevent="userSignUp")
           v-layout(column='')
-            v-flex
-              v-text-field#displayName(name='displayName', v-model='displayName', label='Display Name', type='text', required='')
+            //- v-flex
+            //-   v-text-field#displayName(name='displayName', v-model='displayName', label='Display Name', type='text', required='')
             v-flex
               v-text-field#email(name='email', v-model='email', label='Email', type='email', required='')
             v-flex
               v-text-field#password(name='password', v-model='password', label='Password', type='password', required='')
             v-flex
               v-text-field#confirmPassword(name='confirmPassword', v-model='passwordConfirm', label='Confirm Password', type='password', required='', :rules='[comparePasswords]')
-            v-flex(mt-5='')
-              v-checkbox(v-model='roles.isAdmin', label='Administrators')
-            v-flex(v-show='!roles.isAdmin')
-              v-checkbox(v-model='roles.isEditor', label='Editors')
-              v-checkbox(v-model='roles.isTranslator', label='Translators')
-              v-checkbox(v-model='roles.isDesigner', label='Designer')
+            //- v-flex(mt-5='')
+            //-   v-checkbox(v-model='roles.isAdmin', label='Administrators')
+            //- v-flex(v-show='!roles.isAdmin')
+            //-   v-checkbox(v-model='roles.isEditor', label='Editors')
+            //-   v-checkbox(v-model='roles.isTranslator', label='Translators')
+            //-   v-checkbox(v-model='roles.isDesigner', label='Designer')
             v-flex.text-xs-center(mt-5='')
               v-btn(color='primary', type='submit', :disabled="loading") Sign Up
             v-flex

@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import { store } from './store'
-// import firebase from '@/firebase'
+import firebase from 'firebase'
 import colors from 'vuetify/es5/util/colors'
 
 // A-la'carte components goes here:
@@ -70,30 +70,40 @@ Vue.use(Vuetify, {
 
 Vue.config.productionTip = false
 
-// Vue.prototype.$firebase = firebase
+const config = {
+  apiKey: 'AIzaSyCq7r0cvJsyKWBeKxrQAZWjOy5Em_Uy6Ck',
+  authDomain: 'wolluk-cat.firebaseapp.com',
+  databaseURL: 'https://wolluk-cat.firebaseio.com',
+  projectId: 'wolluk-cat',
+  storageBucket: '',
+  messagingSenderId: '370509732353'
+}
+firebase.initializeApp(config)
+
+Vue.prototype.$firebase = firebase
 // Ust this for Firebase authentication:
 /* eslint-disable no-new */
-// const unsubscribe = firebase.auth()
-//   .onAuthStateChanged((firebaseUser) => {
-//     new Vue({
-//       el: '#app',
-//       router,
-//       store,
-//       render: h => h(App),
-//       created () {
-//         if (firebaseUser) {
-//           store.dispatch('autoSignIn', firebaseUser)
-//         }
-//       }
-//     })
-//     unsubscribe()
-//   })
+const unsubscribe = firebase.auth()
+  .onAuthStateChanged((firebaseUser) => {
+    new Vue({
+      el: '#app',
+      router,
+      store,
+      render: h => h(App),
+      created () {
+        if (firebaseUser) {
+          store.dispatch('autoSignIn', firebaseUser)
+        }
+      }
+    })
+    unsubscribe()
+  })
 
 // Simplified version without Firebase auth:
 /* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-})
+// new Vue({
+//   el: '#app',
+//   router,
+//   store,
+//   render: h => h(App)
+// })
