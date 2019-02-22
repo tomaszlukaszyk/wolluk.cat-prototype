@@ -49,10 +49,10 @@ export default {
   },
   computed: {
     error () {
-      return this.$store.state.users.error
+      return this.$store.state.auth.error
     },
     success () {
-      return this.$store.state.users.success
+      return this.$store.state.auth.success
     },
     roleChosen () {
       for (let key of Object.keys(this.roles)) {
@@ -68,33 +68,24 @@ export default {
       if (this.roleChosen !== true) {
         return
       }
-      this.$store.dispatch('users/updateUser', {
-        id: this.id,
+      const currentUser = this.$store.getters['auth/getCurrentUser']
+      this.$store.dispatch('auth/updateUser', {
         displayName: this.displayName,
         email: this.email,
-        roles: this.roles
-      }).then(() => {
-        this.$store.commit('auth/setUser', { email: this.email })
-        this.$store.commit('users/setSuccess', 'Account information updated successfully')
+        user: currentUser
       })
     },
     setUserFromState () {
-      const email = this.$store.state.auth.user.email
-      const user = this.$store.getters['users/getUserByEmail'](email)
-      this.id = user.id
+      const user = this.$store.getters['auth/getCurrentUser']
       this.displayName = user.displayName
       this.email = user.email
-      this.gravatar = user.gravatar
-      this.roles.isAdmin = user.roles.isAdmin
-      this.roles.isEditor = user.roles.isEditor
-      this.roles.isTranslator = user.roles.isTranslator
-      this.roles.isDesigner = user.roles.isDesigner
+      this.gravatar = user.photoURL
     }
   },
   created () {
     this.setUserFromState()
-    this.$store.commit('users/setError', null)
-    this.$store.commit('users/setSuccess', null)
+    this.$store.commit('auth/setError', null)
+    this.$store.commit('auth/setSuccess', null)
   },
   watch: {
     error (value) {
@@ -104,7 +95,7 @@ export default {
     },
     alert (value) {
       if (!value) {
-        this.$store.commit('users/setError', null)
+        this.$store.commit('auth/setError', null)
       }
     },
     success (value) {
@@ -114,7 +105,7 @@ export default {
     },
     successAlert (value) {
       if (!value) {
-        this.$store.commit('users/setSuccess', null)
+        this.$store.commit('auth/setSuccess', null)
       }
     }
   }

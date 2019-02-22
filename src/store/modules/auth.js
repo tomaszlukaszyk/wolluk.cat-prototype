@@ -1,9 +1,11 @@
 import router from '@/router'
 import firebase from 'firebase'
+import md5 from 'crypto-js/md5'
 
 const state = {
   user: null,
   error: null,
+  success: null,
   loading: false
 }
 
@@ -13,6 +15,9 @@ const mutations = {
   },
   setError (state, payload) {
     state.error = payload
+  },
+  setSuccess (state, payload) {
+    state.success = payload
   },
   setLoading (state, payload) {
     state.loading = payload
@@ -42,6 +47,9 @@ const getters = {
       return false
     }
     return user.gravatar
+  },
+  getCurrentUser () {
+    return firebase.auth().currentUser
   }
 }
 const actions = {
@@ -62,6 +70,9 @@ const actions = {
     firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
     .then(firebaseUser => {
       commit('setUser', {email: firebaseUser.user.email})
+      return dispatch('updatePhotoUrl', firebaseUser.user)
+    })
+    .then(() => {
       commit('setLoading', false)
       router.push('/home')
     })
@@ -69,6 +80,45 @@ const actions = {
       commit('setError', error.message)
       commit('setLoading', false)
     })
+  },
+  updateUser ({commit, dispatch}, payload) {
+    commit('setLoading', true)
+    console.log('payload in updateuser: ')
+    console.log(payload)
+    const promises = []
+    if (payload.user.email !== payload.email) {
+      console.log('inside if for email')
+      promises.push(dispatch('updateEmail', payload))
+    }
+    if (payload.user.displayName !== payload.displayName) {
+      console.log('inside if for display name')
+      promises.push(dispatch('updateDisplayName', payload))
+    }
+    Promise.all(promises)
+    .then(() => {
+      commit('setSuccess', 'Profile updated succesfully')
+      commit('setLoading', false)
+    })
+    .catch(error => {
+      commit('setError', error.message)
+      commit('setLoading', false)
+    })
+  },
+  updateEmail ({commit, dispatch}, payload) {
+    console.log('updating email to: ' + payload.email)
+    return payload.user.updateEmail(payload.email)
+    .then(() => {
+      return dispatch('updatePhotoUrl', payload.user)
+    })
+  },
+  updatePhotoUrl ({commit}, user) {
+    const hash = md5(user.email.trim().toLowerCase())
+    const gravatar = `https://www.gravatar.com/avatar/${hash}?s=200&d=identicon`
+    return user.updateProfile({ photoURL: gravatar })
+  },
+  updateDisplayName ({commit}, payload) {
+    console.log('updating display name to: ' + payload.displayName)
+    return payload.user.updateProfile({ displayName: payload.displayName })
   },
   userSignIn ({commit, rootGetters}, payload) {
     commit('setLoading', true)
