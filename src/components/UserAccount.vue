@@ -96,6 +96,7 @@ export default {
         password: this.password,
         user: this.user
       })
+      this.password = ''
     },
     updateUser () {
       this.$store.dispatch('auth/updateUser', {
@@ -111,6 +112,7 @@ export default {
     },
     closeDialog () {
       this.dialog = false
+      this.password = ''
     }
   },
   created () {

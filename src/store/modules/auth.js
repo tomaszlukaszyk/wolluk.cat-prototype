@@ -84,7 +84,7 @@ const actions = {
   reauthenticate ({commit, dispatch}, payload) {
     payload.user.reauthenticateAndRetrieveDataWithCredential(firebase.auth.EmailAuthProvider.credential(payload.user.email, payload.password))
     .then(() => {
-      return dispatch('updateUser', payload)
+      dispatch('updateUser', payload)
     })
     .catch(error => {
       commit('setError', error.message)
