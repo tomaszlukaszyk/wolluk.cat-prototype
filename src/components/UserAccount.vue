@@ -6,7 +6,7 @@
       v-flex.text-xs-center(xs12, sm5, mt-3, pr-5)
         img(:src='gravatar', style='border-radius: 50%; width:200px')
       v-flex(xs12, sm5, mt-3)
-        form(@submit.prevent="updateUser")
+        form(@submit.prevent="submitForm")
           v-layout(column='')
             v-flex
               v-text-field#email(name='email', v-model='email', label='Email', type='email', required='')
@@ -27,13 +27,23 @@
               v-alert(type='error', dismissible='', v-model='alert') {{ error }}
             v-flex
               v-alert(type='success', dismissible, v-model='successAlert') {{ success }}
+    v-dialog(v-model='dialog', persistent, max-width='300')
+      v-card
+        v-card-title.headline
+          | Please re-enter your password
+        v-card-text
+          v-text-field#password(name='password', v-model='password', label='Password', type='password', required='')
+        v-card-actions
+          v-spacer
+          v-btn(flat, small, color='primary', @click='reauthenticate') Submit
+          v-btn(flat, small, color='primary', @click='closeDialog') Cancel
 </template>
 
 <script>
 export default {
   data () {
     return {
-      id: '',
+      password: '',
       displayName: '',
       email: '',
       gravatar: '',
@@ -44,7 +54,8 @@ export default {
         isDesigner: false
       },
       alert: false,
-      successAlert: false
+      successAlert: false,
+      dialog: false
     }
   },
   computed: {
@@ -53,6 +64,9 @@ export default {
     },
     success () {
       return this.$store.state.auth.success
+    },
+    user () {
+      return this.$store.getters['auth/getCurrentUser']
     },
     roleChosen () {
       for (let key of Object.keys(this.roles)) {
@@ -64,22 +78,39 @@ export default {
     }
   },
   methods: {
-    updateUser () {
+    submitForm () {
       if (this.roleChosen !== true) {
         return
       }
-      const currentUser = this.$store.getters['auth/getCurrentUser']
+      if (this.email !== this.user.email) {
+        this.dialog = true
+      } else {
+        this.updateUser()
+      }
+    },
+    reauthenticate () {
+      this.dialog = false
+      this.$store.dispatch('auth/reauthenticate', {
+        displayName: this.displayName,
+        email: this.email,
+        password: this.password,
+        user: this.user
+      })
+    },
+    updateUser () {
       this.$store.dispatch('auth/updateUser', {
         displayName: this.displayName,
         email: this.email,
-        user: currentUser
+        user: this.user
       })
     },
     setUserFromState () {
-      const user = this.$store.getters['auth/getCurrentUser']
-      this.displayName = user.displayName
-      this.email = user.email
-      this.gravatar = user.photoURL
+      this.displayName = this.user.displayName
+      this.email = this.user.email
+      this.gravatar = this.user.photoURL
+    },
+    closeDialog () {
+      this.dialog = false
     }
   },
   created () {

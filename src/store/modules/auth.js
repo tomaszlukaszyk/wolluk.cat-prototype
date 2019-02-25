@@ -81,6 +81,16 @@ const actions = {
       commit('setLoading', false)
     })
   },
+  reauthenticate ({commit, dispatch}, payload) {
+    payload.user.reauthenticateAndRetrieveDataWithCredential(firebase.auth.EmailAuthProvider.credential(payload.user.email, payload.password))
+    .then(() => {
+      return dispatch('updateUser', payload)
+    })
+    .catch(error => {
+      commit('setError', error.message)
+      commit('setLoading', false)
+    })
+  },
   updateUser ({commit, dispatch}, payload) {
     commit('setLoading', true)
     console.log('payload in updateuser: ')
