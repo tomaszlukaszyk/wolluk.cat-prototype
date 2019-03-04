@@ -4,7 +4,7 @@
       v-flex.text-xs-center(xs12='', mt-5='')
         h1 Edit account details
       v-flex.text-xs-center(xs12, sm5, mt-3, pr-5)
-        img(:src='gravatar', style='border-radius: 50%; width:200px')
+        img(:src='photoURL', style='border-radius: 50%; width:200px')
       v-flex(xs12, sm5, mt-3)
         form(@submit.prevent="submitForm")
           v-layout(column='')
@@ -13,15 +13,15 @@
             v-flex
               v-text-field#displayName(name='displayName', v-model='displayName', label='Display Name', type='text', required='')
             v-flex(mt-5='')
-              v-checkbox(v-model='roles.isAdmin', label='Administrators', height='10', :rules='[roleChosen]')
-            v-flex(v-show='!roles.isAdmin')
-              v-checkbox(v-model='roles.isEditor', label='Editors', height='10', :rules='[roleChosen]')
-              v-checkbox(v-model='roles.isTranslator', label='Translators', height='10', :rules='[roleChosen]')
-              v-checkbox(v-model='roles.isDesigner', label='Designer', height='10', :rules='[roleChosen]')
+              v-checkbox(v-model='isAdmin', label='Administrators', height='10', :rules='[roleChosen]')
+            v-flex(v-show='!isAdmin')
+              v-checkbox(v-model='isEditor', label='Editors', height='10', :rules='[roleChosen]')
+              v-checkbox(v-model='isTranslator', label='Translators', height='10', :rules='[roleChosen]')
+              v-checkbox(v-model='isDesigner', label='Designer', height='10', :rules='[roleChosen]')
             v-flex(mt-5='')
               v-btn(flat, to='/password', color='red', small, right) Reset password
             v-flex(mt-5='')
-              v-btn(@click='setUserFromState', right) Cancel
+              v-btn(@click='', right) Cancel
               v-btn(color='primary', type='submit') Save
             v-flex
               v-alert(type='error', dismissible='', v-model='alert') {{ error }}
@@ -44,18 +44,8 @@ export default {
   data () {
     return {
       password: '',
-      displayName: '',
-      email: '',
-      gravatar: '',
-      roles: {
-        isAdmin: false,
-        isEditor: false,
-        isTranslator: false,
-        isDesigner: false
-      },
       alert: false,
-      successAlert: false,
-      dialog: false
+      successAlert: false
     }
   },
   computed: {
@@ -65,58 +55,85 @@ export default {
     success () {
       return this.$store.state.auth.success
     },
-    user () {
-      return this.$store.getters['auth/getCurrentUser']
+    displayName: {
+      get () {
+        return this.$store.state.auth.user.displayName
+      },
+      set (value) {
+        this.$store.commit('auth/setDisplayName', value)
+      }
+    },
+    email: {
+      get () {
+        return this.$store.state.auth.user.email
+      },
+      set (value) {
+        this.$store.commit('auth/setEmail', value)
+      }
+    },
+    photoURL () {
+      return this.$store.state.auth.user.photoURL
+    },
+    isAdmin: {
+      get () {
+        return this.$store.state.auth.roles.isAdmin
+      },
+      set (value) {
+        this.$store.commit('auth/setAdminRole', value)
+      }
+    },
+    isEditor: {
+      get () {
+        return this.$store.state.auth.roles.isEditor
+      },
+      set (value) {
+        this.$store.commit('auth/setEditorRole', value)
+      }
+    },
+    isTranslator: {
+      get () {
+        return this.$store.state.auth.roles.isTranslator
+      },
+      set (value) {
+        this.$store.commit('auth/setTranslatorRole', value)
+      }
+    },
+    isDesigner: {
+      get () {
+        return this.$store.state.auth.roles.isDesigner
+      },
+      set (value) {
+        this.$store.commit('auth/setDesignerRole', value)
+      }
+    },
+    dialog () {
+      return this.$store.state.auth.dialog
     },
     roleChosen () {
-      for (let key of Object.keys(this.roles)) {
-        if (this.roles[key]) {
-          return true
-        }
-      }
-      return 'You must choose at least one role'
+      // for (let key of Object.keys(this.roles)) {
+      //   if (this.roles[key]) {
+      //     return true
+      //   }
+      // }
+      // return 'You must choose at least one role'
+      return true
     }
   },
   methods: {
     submitForm () {
-      if (this.roleChosen !== true) {
-        return
-      }
-      if (this.email !== this.user.email) {
-        this.dialog = true
-      } else {
-        this.updateUser()
-      }
+      this.$store.dispatch('auth/submitForm')
     },
     reauthenticate () {
-      this.dialog = false
-      this.$store.dispatch('auth/reauthenticate', {
-        displayName: this.displayName,
-        email: this.email,
-        password: this.password,
-        user: this.user
-      })
+      this.$store.dispatch('auth/reauthenticate', this.password)
+      this.$store.commit('auth/setDialog', false)
       this.password = ''
     },
-    updateUser () {
-      this.$store.dispatch('auth/updateUser', {
-        displayName: this.displayName,
-        email: this.email,
-        user: this.user
-      })
-    },
-    setUserFromState () {
-      this.displayName = this.user.displayName
-      this.email = this.user.email
-      this.gravatar = this.user.photoURL
-    },
     closeDialog () {
-      this.dialog = false
+      this.$store.commit('auth/setDialog', false)
       this.password = ''
     }
   },
   created () {
-    this.setUserFromState()
     this.$store.commit('auth/setError', null)
     this.$store.commit('auth/setSuccess', null)
   },

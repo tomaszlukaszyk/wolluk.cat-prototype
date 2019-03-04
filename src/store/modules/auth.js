@@ -4,14 +4,57 @@ import md5 from 'crypto-js/md5'
 
 const state = {
   user: null,
+  roles: null,
   error: null,
   success: null,
-  loading: false
+  loading: false,
+  dialog: false
 }
 
 const mutations = {
   setUser (state, payload) {
-    state.user = payload
+    if (payload == null) {
+      state.user = null
+      return
+    }
+    state.user = {
+      displayName: payload.displayName,
+      email: payload.email,
+      photoURL: payload.photoURL
+    }
+  },
+  setRoles (state, payload) {
+    if (payload == null) {
+      state.roles = null
+      return
+    }
+    state.roles = {
+      isAdmin: payload.isAdmin,
+      isEditor: payload.isEditor,
+      isTranslator: payload.isTranslator,
+      isDesigner: payload.isDesigner
+    }
+  },
+  setDisplayName (state, payload) {
+    state.user.displayName = payload
+  },
+  setEmail (state, payload) {
+    state.user.email = payload
+  },
+  setPhotoUrl (state, payload) {
+    state.user.photoURL = payload
+  },
+  setAdminRole (state, payload) {
+    state.roles.isAdmin = payload
+  },
+  setEditorRole (state, payload) {
+    state.roles.isEditor = payload
+  },
+  setTranslatorRole (state, payload) {
+    state.roles.isTranslator = payload
+  },
+  setDesignerRole (state, payload) {
+    state.roles.isDesigner = payload
   },
   setError (state, payload) {
     state.error = payload
@@ -21,6 +64,9 @@ const mutations = {
   },
   setLoading (state, payload) {
     state.loading = payload
+  },
+  setDialog (state, payload) {
+    state.dialog = payload
   }
 }
 
@@ -37,19 +83,6 @@ const getters = {
       return false
     }
     return user.roles.isAdmin === true
-  },
-  getGravatar (state, getters, rootState, rootGetters) {
-    if (state.user == null) {
-      return false
-    }
-    const user = rootGetters['users/getUserByEmail'](state.user.email)
-    if (!user) {
-      return false
-    }
-    return user.gravatar
-  },
-  getCurrentUser () {
-    return firebase.auth().currentUser
   }
 }
 const actions = {
@@ -57,37 +90,98 @@ const actions = {
     commit('setLoading', true)
     firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
     .then(firebaseUser => {
-      commit('setUser', {email: firebaseUser.user.email})
-      return dispatch('updatePhotoUrl', firebaseUser.user)
-    })
-    .then(() => {
+      commit('setUser', firebaseUser.user)
       commit('setLoading', false)
       router.push('/home')
+      dispatch('updatePhotoUrl', firebaseUser.user)
+      dispatch('updateRoles', {
+        uid: firebaseUser.user.uid,
+        roles: {
+          isAdmin: false,
+          isEditor: false,
+          isTranslator: false,
+          isDesigner: false
+        }
+      })
+      commit('setRoles', {
+        isAdmin: false,
+        isEditor: false,
+        isTranslator: false,
+        isDesigner: false
+      })
     })
     .catch(error => {
       commit('setError', error.message)
       commit('setLoading', false)
     })
   },
-  reauthenticate ({commit, dispatch}, payload) {
-    payload.user.reauthenticateAndRetrieveDataWithCredential(firebase.auth.EmailAuthProvider.credential(payload.user.email, payload.password))
+  userSignIn ({commit}, payload) {
+    commit('setLoading', true)
+    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+    .then(firebaseUser => {
+      firebase.auth().currentUser.getIdTokenResult()
+      .then((idToken) => {
+        commit('setUser', firebaseUser.user)
+        commit('setRoles', idToken.claims.roles)
+        commit('setLoading', false)
+        commit('setError', null)
+        router.push('/home')
+      })
+    })
+    .catch(error => {
+      commit('setError', error.message)
+      commit('setLoading', false)
+    })
+  },
+  autoSignIn ({commit}, payload) {
+    firebase.auth().currentUser.getIdTokenResult()
+    .then((idToken) => {
+      commit('setUser', payload)
+      commit('setRoles', idToken.claims.roles)
+    })
+    .catch(() => {
+      router.push('/')
+    })
+  },
+  userSignOut ({commit}) {
+    firebase.auth().signOut()
+    commit('setUser', null)
+    commit('setRoles', null)
+    router.push('/')
+  },
+  submitForm ({commit, dispatch, state}) {
+    const currentUser = firebase.auth().currentUser
+    if (currentUser.email !== state.user.email) {
+      commit('setDialog', true)
+    } else {
+      dispatch('updateUser', currentUser)
+    }
+  },
+  reauthenticate ({commit, dispatch}, password) {
+    const currentUser = firebase.auth().currentUser
+    currentUser.reauthenticateAndRetrieveDataWithCredential(firebase.auth.EmailAuthProvider.credential(currentUser.email, password))
     .then(() => {
-      dispatch('updateUser', payload)
+      dispatch('updateUser', currentUser)
     })
     .catch(error => {
       commit('setError', error.message)
       commit('setLoading', false)
     })
   },
-  updateUser ({commit, dispatch}, payload) {
+  updateUser ({commit, dispatch, state}, currentUser) {
     commit('setLoading', true)
     const promises = []
-    if (payload.user.email !== payload.email) {
-      promises.push(dispatch('updateEmail', payload))
+    if (currentUser.email !== state.user.email) {
+      promises.push(dispatch('updateEmail', currentUser))
     }
-    if (payload.user.displayName !== payload.displayName) {
-      promises.push(dispatch('updateDisplayName', payload))
+    if (currentUser.displayName !== state.user.displayName) {
+      promises.push(dispatch('updateDisplayName', currentUser))
     }
+    const addRoles = firebase.functions().httpsCallable('addRoles')
+    promises.push(addRoles({
+      uid: currentUser.uid,
+      roles: state.roles
+    }))
     Promise.all(promises)
     .then(() => {
       commit('setSuccess', 'Profile updated succesfully')
@@ -98,41 +192,27 @@ const actions = {
       commit('setLoading', false)
     })
   },
-  updateEmail ({dispatch}, payload) {
-    return payload.user.updateEmail(payload.email)
+  updateEmail ({dispatch, state}, currentUser) {
+    return currentUser.updateEmail(state.user.email)
     .then(() => {
-      return dispatch('updatePhotoUrl', payload.user)
+      return dispatch('updatePhotoUrl', currentUser)
     })
   },
-  updatePhotoUrl ({commit}, user) {
-    const hash = md5(user.email.trim().toLowerCase())
+  updatePhotoUrl ({commit, state}, currentUser) {
+    const hash = md5(state.user.email.trim().toLowerCase())
     const gravatar = `https://www.gravatar.com/avatar/${hash}?s=200&d=identicon`
-    return user.updateProfile({ photoURL: gravatar })
+    commit('setPhotoUrl', gravatar)
+    return currentUser.updateProfile({ photoURL: gravatar })
   },
-  updateDisplayName ({commit}, payload) {
-    return payload.user.updateProfile({ displayName: payload.displayName })
+  updateDisplayName ({state}, currentUser) {
+    return currentUser.updateProfile({ displayName: state.user.displayName })
   },
-  userSignIn ({commit}, payload) {
-    commit('setLoading', true)
-    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-    .then(firebaseUser => {
-      commit('setUser', {email: firebaseUser.user.email})
-      commit('setLoading', false)
-      commit('setError', null)
-      router.push('/home')
+  updateRoles ({commit}, payload) {
+    const addRoles = firebase.functions().httpsCallable('addRoles')
+    return addRoles({
+      uid: payload.uid,
+      roles: payload.roles
     })
-    .catch(error => {
-      commit('setError', error.message)
-      commit('setLoading', false)
-    })
-  },
-  autoSignIn ({commit}, payload) {
-    commit('setUser', { email: payload.email })
-  },
-  userSignOut ({commit}) {
-    firebase.auth().signOut()
-    commit('setUser', null)
-    router.push('/')
   }
 }
 export default {
