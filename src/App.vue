@@ -5,7 +5,7 @@
     v-toolbar(app="" clipped-left fixed color="green" dark)
       span
         v-toolbar-side-icon(@click="sidebar = !sidebar")
-      v-toolbar-title 
+      v-toolbar-title
         router-link(to="/" tag="span" style="cursor:pointer") {{ appTitle }}
       v-spacer
       v-toolbar-items.hidden-xs-only
@@ -16,21 +16,21 @@
           v-btn(flat slot='activator')
             v-icon settings
           v-list(light)
-            v-list-tile(router to='/account') 
+            v-list-tile(router to='/account')
               v-list-tile-action
                 v-icon(left, v-if='gravatar === false') account_circle
                 img(v-else, :src='gravatar', style='border-radius: 50%; width:30px')
               v-list-tile-title My account
-            v-list-tile(router to='/password') 
+            v-list-tile(router to='/password')
               v-list-tile-action
                 v-icon(left) vpn_key
               v-list-tile-title Reset password
-            v-list-tile(v-if='isAdmin', router to='/users') 
+            v-list-tile(v-if='isAdmin', router to='/users')
               v-list-tile-action
                 v-icon(left) people
               v-list-tile-title System users
             v-divider
-            v-list-tile(@click='userSignOut') 
+            v-list-tile(@click='userSignOut')
               v-list-tile-action
                 v-icon(left) exit_to_app
               v-list-tile-title Sign Out
